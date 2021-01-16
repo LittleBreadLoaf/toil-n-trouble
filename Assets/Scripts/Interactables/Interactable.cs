@@ -6,6 +6,7 @@ public class Interactable : MonoBehaviour
 {
 
     public bool playerInRange;
+    public PlayerMovement player;
     protected Animator anim;
 
     // Start is called before the first frame update
@@ -17,16 +18,11 @@ public class Interactable : MonoBehaviour
     // Update is called once per frame
     public virtual void Update()
     {
-        if (Input.GetButtonDown("Action") && playerInRange)
-        {
-            OnPlayerInteract();
-        }
 
     }
 
     public virtual void OnPlayerInteract()
     {
-        
     }
 
     protected virtual void OnPlayerEnteredRange()

@@ -34,7 +34,7 @@ public class Plant : Interactable
 
     public virtual void OnHarvest()
     {
-        anim.SetBool("harvest", true);
+        anim.SetBool("plantHarvest", true);
         if (destroyOnHarvest)
         {
             StartCoroutine(HarvestDestroyCoroutine());
@@ -55,13 +55,13 @@ public class Plant : Interactable
     IEnumerator HarvestDestroyCoroutine()
     {
         yield return new WaitForSeconds(harvestAnimLength);
-        anim.SetBool("harvest", false);
+        anim.SetBool("plantHarvest", false);
         this.gameObject.SetActive(false);
     }
 
     IEnumerator HarvestCoroutine()
     {
         yield return new WaitForSeconds(harvestAnimLength);
-        anim.SetBool("harvest", false);
+        anim.SetBool("plantHarvest", false);
     }
 }

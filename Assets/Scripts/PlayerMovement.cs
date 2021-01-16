@@ -7,7 +7,8 @@ public enum PlayerState
     walk,
     attack,
     interact,
-    stagger
+    stagger,
+    harvest
 }
 
 public class PlayerMovement : MonoBehaviour
@@ -36,7 +37,7 @@ public class PlayerMovement : MonoBehaviour
         speedChange = Vector2.zero;
         speedChange.x = Input.GetAxisRaw("Horizontal");
         speedChange.y = Input.GetAxisRaw("Vertical");
-        if (Input.GetButtonDown("Action"))
+        if (Input.GetButtonDown("Attack"))
         {
             if (currentState != PlayerState.attack
                 && currentState != PlayerState.stagger)
@@ -44,7 +45,26 @@ public class PlayerMovement : MonoBehaviour
                 StartCoroutine(AttackCo());
             }
         }
-        else if(currentState == PlayerState.walk)
+        else if (Input.GetButtonDown("Interact"))
+        {
+            if(currentState == PlayerState.walk)
+            {
+                Interactable interactable = FindClosestInteractable();
+                if(interactable != null) {
+                    if (interactable is Plant)
+                    {
+                        Plant plant = (Plant)interactable;
+                        StartCoroutine(HarvestCo(plant));
+                    }
+                    else
+                    {
+                        interactable.OnPlayerInteract();
+                    }
+                }
+                
+            }
+        }
+        else if (currentState == PlayerState.walk)
         {
             UpdateAnimationAndMove();
         }
@@ -57,6 +77,17 @@ public class PlayerMovement : MonoBehaviour
         yield return null;
         animator.SetBool("attacking", false);
         yield return new WaitForSeconds(0.28f);
+        currentState = PlayerState.walk;
+    }
+
+    private IEnumerator HarvestCo(Plant plant)
+    {
+        animator.SetBool("harvesting", true);
+        currentState = PlayerState.harvest;
+        plant.OnPlayerInteract();
+        yield return null;
+        animator.SetBool("harvesting", false);
+        yield return new WaitForSeconds(plant.harvestAnimLength); 
         currentState = PlayerState.walk;
     }
 
@@ -99,5 +130,32 @@ public class PlayerMovement : MonoBehaviour
             playerRigidBody.velocity = Vector2.zero;
             currentState = PlayerState.walk;
         }
+    }
+
+    public Interactable FindClosestInteractable()
+    {
+        GameObject[] gos;
+        gos = GameObject.FindGameObjectsWithTag("Interactable");
+        Interactable closest = null;
+        float distance = Mathf.Infinity;
+        Vector3 position = transform.position;
+        foreach (GameObject go in gos)
+        {
+            Interactable interact = go.GetComponent<Interactable>();
+            if (interact == null)
+                continue;
+            else
+            {
+                Vector3 diff = go.transform.position - position;
+                float curDistance = diff.sqrMagnitude;
+                if (curDistance < distance)
+                {
+                    if(interact.playerInRange)
+                        closest = interact;
+                    distance = curDistance;
+                }
+            }
+        }
+        return closest;
     }
 }

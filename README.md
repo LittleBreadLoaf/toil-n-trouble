@@ -1,2 +1,3 @@
-# toil-n-trouble
-Toil &amp; Trouble
+# Toil &amp; Trouble
+
+A story-driven game of magic and witchery.
